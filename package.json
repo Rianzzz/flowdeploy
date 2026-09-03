@@ -1,0 +1,16 @@
+{
+  "name": "flowdeploy",
+  "version": "1.0.0",
+  "description": "FlowDeploy — interface web local para criar, publicar e consultar WhatsApp Flows via API do Blip (msging.net), sem precisar do Postman.",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^2.7.0",
+    "uuid": "^9.0.1"
+  }
+}

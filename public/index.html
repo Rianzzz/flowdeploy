@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FlowDeploy</title>
+  <script>
+    // aplica o tema antes do primeiro paint pra nao piscar claro->escuro
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) { /* localStorage indisponivel, mantem padrao claro */ }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div class="topbar-title">
+        <strong>FlowDeploy</strong>
+        <span class="muted">criação de WhatsApp Flows sem Postman</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button id="btn-theme-toggle" class="icon-btn" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro"></button>
+      <button id="btn-open-config" class="icon-btn" title="Configurações" aria-label="Configurações">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <nav class="steps" id="steps-nav">
+    <button class="step-tab active" data-step="1">
+      <span class="step-num"><span class="step-digit">1</span><svg class="step-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg></span>
+      Criar flow
+    </button>
+    <button class="step-tab" data-step="2" disabled>
+      <span class="step-num"><span class="step-digit">2</span><svg class="step-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg></span>
+      Colar JSON
+    </button>
+    <button class="step-tab" data-step="3" disabled>
+      <span class="step-num"><span class="step-digit">3</span><svg class="step-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg></span>
+      Publicar
+    </button>
+    <button class="step-tab" data-step="4" disabled>
+      <span class="step-num"><span class="step-digit">4</span><svg class="step-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg></span>
+      Consultar
+    </button>
+  </nav>
+
+  <main class="container">
+
+    <!-- ETAPA 1: criar flow -->
+    <section class="step-panel active" id="panel-1">
+      <h2>Criar flow</h2>
+      <p class="panel-desc">Dê um nome para o flow. Ele será criado na categoria <code>OTHER</code> automaticamente.</p>
+
+      <label>Nome do flow
+        <input type="text" id="flow-name" placeholder="Ex: Qualificação de Lead" />
+      </label>
+
+      <button id="btn-create-flow" class="btn btn-primary">Criar flow</button>
+
+      <div id="create-flow-result" class="result hidden"></div>
+
+      <div class="flow-id-box">
+        <label>ID do flow (preenchido automaticamente quando possível, confira/edite se precisar)
+          <input type="text" id="flow-id" placeholder="Ex: 1564737008435776" />
+        </label>
+      </div>
+
+      <button id="btn-next-1" class="btn next-step-btn hidden" data-goto="2">Próximo: Colar JSON →</button>
+    </section>
+
+    <!-- ETAPA 2: colar JSON -->
+    <section class="step-panel" id="panel-2">
+      <h2>Colar JSON</h2>
+      <p class="panel-desc">
+        Cole aqui o JSON com as telas do flow. Dois formatos são aceitos:<br />
+        1) Só o conteúdo das telas: <code>{ "screens": [...], "version": "7.3" }</code><br />
+        2) O comando completo copiado do Postman (com <code>id</code>, <code>to</code>, <code>resource</code> etc.) — o app extrai as telas automaticamente de dentro de <code>resource</code>.
+      </p>
+
+      <label>JSON do flow
+        <textarea id="flow-json" rows="18" placeholder='{&#10;  "version": "7.3",&#10;  "screens": [ ... ]&#10;}'></textarea>
+      </label>
+
+      <button id="btn-send-screens" class="btn btn-primary">Enviar JSON para o flow</button>
+
+      <div id="screens-result" class="result hidden"></div>
+
+      <button id="btn-next-2" class="btn next-step-btn hidden" data-goto="3">Próximo: Publicar →</button>
+    </section>
+
+    <!-- ETAPA 3: publicar -->
+    <section class="step-panel" id="panel-3">
+      <h2>Publicar flow</h2>
+      <p class="panel-desc">Publica o flow identificado pelo ID informado na etapa 1, tornando as telas enviadas na etapa 2 ativas.</p>
+
+      <button id="btn-publish" class="btn btn-primary">Publicar flow</button>
+
+      <div id="publish-result" class="result hidden"></div>
+
+      <button id="btn-next-3" class="btn next-step-btn hidden" data-goto="4">Próximo: Consultar →</button>
+    </section>
+
+    <!-- ETAPA 4: consultar -->
+    <section class="step-panel" id="panel-4">
+      <h2>Consultar flow</h2>
+      <p class="panel-desc">Busca e exibe os dados/status atuais do flow, incluindo o link de pré-visualização quando disponível.</p>
+
+      <button id="btn-query" class="btn btn-primary">Consultar flow</button>
+
+      <div id="query-result" class="result hidden"></div>
+    </section>
+
+  </main>
+
+  <!-- Modal de configurações -->
+  <div id="config-modal" class="modal hidden">
+    <div class="modal-box">
+      <h2>Configurações</h2>
+      <p class="panel-desc">Esses dados ficam salvos só neste navegador (nunca no servidor) e são enviados a cada chamada pra API do Blip. Se estiver usando o app em outro dispositivo ou navegador, precisa configurar de novo lá.</p>
+
+      <label>Contrato (o subdomínio antes de <code>.http.msging.net</code>)
+        <input type="text" id="cfg-contract" placeholder="wlck" />
+      </label>
+
+      <label>Authorization
+        <input type="text" id="cfg-authorization" placeholder="Key ZXhhbXBsZWJvdDpzdWFTZW5oYUFxdWk=" />
+        <span class="muted" id="cfg-authorization-hint"></span>
+      </label>
+
+      <div class="modal-actions">
+        <button id="btn-cfg-cancel" class="btn btn-ghost">Cancelar</button>
+        <button id="btn-cfg-save" class="btn btn-primary">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
